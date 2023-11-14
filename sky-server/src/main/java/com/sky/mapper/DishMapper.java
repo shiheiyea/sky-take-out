@@ -7,7 +7,6 @@ import com.sky.entity.Dish;
 import com.sky.enumeration.OperationType;
 import com.sky.vo.DishVO;
 import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -81,4 +80,22 @@ public interface DishMapper {
      * @return
      */
     List<Dish> list(Dish dish);
+
+    /**
+     * 根据套餐与菜品关系查询菜品
+     *
+     * @param setmealDishes
+     * @return
+     */
+//    @Select("select * from dish d left join setmeal_dish sd on sd.dish_id = d.id")
+//    List<Dish> getListBySetmealDish(List<SetmealDish> setmealDishes);
+
+    /**
+     * 根据套餐id查询菜品
+     *
+     * @param setmealId
+     * @return
+     */
+    @Select("select d.* from dish d left join setmeal_dish sd on sd.dish_id = d.id where sd.setmeal_id = #{setmealId}")
+    List<Dish> getBySetmealId(Long setmealId);
 }

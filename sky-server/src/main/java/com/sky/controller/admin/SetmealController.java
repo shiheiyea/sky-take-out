@@ -1,6 +1,5 @@
 package com.sky.controller.admin;
 
-import com.sky.constant.MessageConstant;
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
 import com.sky.result.PageResult;
@@ -92,6 +91,20 @@ public class SetmealController {
     public Result update(@RequestBody SetmealDTO setmealDTO) {
         log.info("修改套餐");
         setmealService.update(setmealDTO);
+        return Result.success();
+    }
+
+    /**
+     * 套餐的起售和停售
+     * @param status
+     * @param id
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    @ApiOperation("套餐的起售和停售")
+    public Result startOrStop(@PathVariable Integer status, Long id) {
+        log.info("套餐的起售和停售：{} {}", status, id);
+        setmealService.startOrStop(status, id);
         return Result.success();
     }
 }
