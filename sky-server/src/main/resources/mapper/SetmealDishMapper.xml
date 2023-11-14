@@ -11,6 +11,13 @@
         </foreach>
     </insert>
 
+    <delete id="deleteBySetmealIds">
+        delete from setmeal_dish where setmeal_id in
+        <foreach collection="setmealIds" item="setmealId" open="(" separator="," close=")">
+            #{setmealId}
+        </foreach>
+    </delete>
+
     <select id="getSetmealIdsByDishIds" resultType="java.lang.Long">
         select setmeal_id from setmeal_dish where dish_id in
         <foreach collection="dishIds" item="dishId" separator="," open="(" close=")">
@@ -18,22 +25,4 @@
         </foreach>
     </select>
 
-    <select id="pageQuery" resultType="com.sky.vo.SetmealVO">
-        select s.*, c.name categoryName
-        from setmeal s
-        left join category c
-        on s.category_id = c.id
-        <where>
-            <if test="name != null">
-                and name like concat('%',#{name},'%')
-            </if>
-            <if test="categoryId != null">
-                and s.category_id = #{categoryId}
-            </if>
-            <if test="status != null">
-                and s.status = #{status}
-            </if>
-        </where>
-        order by s.create_time desc
-    </select>
 </mapper>
