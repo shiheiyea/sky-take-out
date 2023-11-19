@@ -11,3 +11,7 @@ sky:
     access-key-id: LTAI5tE31yZJTRfPLw8mb79z
     access-key-secret: fAAkilyJVvDYw2qQH9ehd2YTvgSK3p
     bucket-name: sky-itcast-heiye
+  redis:
+    host: localhost
+    post: 6379
+    database: 10
