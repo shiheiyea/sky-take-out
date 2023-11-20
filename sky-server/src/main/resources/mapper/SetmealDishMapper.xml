@@ -24,5 +24,4 @@
             #{dishIds}
         </foreach>
     </select>
-
 </mapper>
