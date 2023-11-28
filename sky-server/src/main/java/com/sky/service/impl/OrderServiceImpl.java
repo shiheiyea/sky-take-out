@@ -1,6 +1,5 @@
 package com.sky.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -28,9 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -152,16 +149,11 @@ public class OrderServiceImpl implements OrderService {
         vo.setPackageStr(jsonObject.getString("package"));
 
         //为替代微信支付成功后的数据库订单状态更新，多定义一个方法进行修改
-
-//        Integer OrderPaidStatus = Orders.PAID; //支付状态，已支付
-//
-//        Integer OrderStatus = Orders.TO_BE_CONFIRMED;  //订单状态，待接单
-//
-//        //发现没有将支付时间 check_out属性赋值，所以在这里更新
-//
-//        LocalDateTime check_out_time = LocalDateTime.now();
-
-//        orderMapper.updateStatus(OrderStatus, OrderPaidStatus, check_out_time, orderid);
+        Orders orders = orderMapper.getByNumber(ordersPaymentDTO.getOrderNumber());
+        orders.setStatus(Orders.TO_BE_CONFIRMED);//支付状态，已支付
+        orders.setPayStatus(Orders.PAID);//订单状态，待接单
+        orders.setCheckoutTime(LocalDateTime.now());//发现没有将支付时间 check_out属性赋值，所以在这里更新
+        orderMapper.update(orders);
 
         return vo;
 
@@ -257,5 +249,47 @@ public class OrderServiceImpl implements OrderService {
         orderVO.setOrderDetailList(orderDetailList);
 
         return orderVO;
+    }
+
+    /**
+     * 取消订单
+     *
+     * @param id
+     */
+    public void userCancelById(Long id) {
+        Orders ordersDB = orderMapper.getById(id);
+
+        // 校验订单是否存在
+        if (ordersDB == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+
+        //订单状态 1待付款 2待接单 3已接单 4派送中 5已完成 6已取消
+        if (ordersDB.getStatus() > 2) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+        Orders orders = new Orders();
+        orders.setId(ordersDB.getId());
+
+        // 订单处于待接单状态下取消，需要进行退款
+        if (ordersDB.getStatus().equals(Orders.TO_BE_CONFIRMED)) {
+            //调用微信支付退款接口
+//            weChatPayUtil.refund(
+//                    ordersDB.getNumber(), //商户订单号
+//                    ordersDB.getNumber(), //商户退款单号
+//                    new BigDecimal(0.01),//退款金额，单位 元
+//                    new BigDecimal(0.01));//原订单金额
+
+            //支付状态修改为 退款
+            orders.setPayStatus(Orders.REFUND);
+        }
+
+        // 更新订单状态、取消原因、取消时间
+        orders.setStatus(Orders.CANCELLED);
+        orders.setCancelReason("用户取消");
+        orders.setCancelTime(LocalDateTime.now());
+
+        orderMapper.update(orders);
     }
 }
