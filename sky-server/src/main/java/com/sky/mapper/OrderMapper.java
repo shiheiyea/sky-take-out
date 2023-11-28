@@ -44,6 +44,14 @@ public interface OrderMapper {
     Page<Orders> pageQuery(OrdersPageQueryDTO ordersPageQueryDTO);
 
     /**
+     * 根据订单id查询数据
+     * @param id
+     * @return
+     */
+    @Select("select * from orders where id = #{id};")
+    Orders getById(Long id);
+
+    /**
      * 用于替换微信支付更新数据库状态的问题
      * @param orderStatus
      * @param orderPaidStatus
