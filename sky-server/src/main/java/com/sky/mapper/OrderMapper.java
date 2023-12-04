@@ -52,6 +52,14 @@ public interface OrderMapper {
     Orders getById(Long id);
 
     /**
+     * 查询在status状态下的订单
+     * @param status
+     * @return
+     */
+    @Select("select count(id) from orders where status = #{status}")
+    Integer countStatus(Integer status);
+
+    /**
      * 用于替换微信支付更新数据库状态的问题
      * @param orderStatus
      * @param orderPaidStatus
