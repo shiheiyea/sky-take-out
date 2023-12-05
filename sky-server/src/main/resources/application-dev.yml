@@ -18,3 +18,7 @@ sky:
   wechat:
     appid: wxbcd5873854332278
     secret: 0f925c66b3fa180a09a9a6493b003659
+  shop:
+    address: 广东省广州市增城区增城宾馆
+  baidu:
+    ak: TTpmd7hcEkxQVPcLYoGPlTnCgQk41llf
