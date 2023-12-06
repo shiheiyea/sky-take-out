@@ -21,6 +21,7 @@ import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import com.sky.websocket.WebSocketServer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -61,6 +62,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Value("${sky.baidu.ak}")
     private String ak;
+
+    @Autowired
+    private WebSocketServer webSocketServer;
 
     /**
      * 用户下单
@@ -170,6 +174,15 @@ public class OrderServiceImpl implements OrderService {
         orders.setCheckoutTime(LocalDateTime.now());//发现没有将支付时间 check_out属性赋值，所以在这里更新
         orderMapper.update(orders);
 
+        //通过websocket向客户端浏览器推送消息 type orderId content
+        Map map = new HashMap();
+        map.put("type", 1);//1表示来单提醒 2表示客服催单
+        map.put("orderId", orders.getId());
+        map.put("content", "订单号：" + orders.getNumber());
+
+        String json = JSON.toJSONString(map);
+        webSocketServer.sendToAllClient(json);
+
         return vo;
 
     }
@@ -196,13 +209,13 @@ public class OrderServiceImpl implements OrderService {
         orderMapper.update(orders);
 
         //通过websocket向客户端浏览器推送消息 type orderId content
-//        Map map = new HashMap();
-//        map.put("type", 1);//1表示来单提醒 2表示客服催单
-//        map.put("orderId", ordersDB.getId());
-//        map.put("content", "订单号：" + outTradeNo);
-//
-//        String json = JSON.toJSONString(map);
-//        webSocketService.sendToAllClient(json);
+        Map map = new HashMap();
+        map.put("type", 1);//1表示来单提醒 2表示客服催单
+        map.put("orderId", ordersDB.getId());
+        map.put("content", "订单号：" + outTradeNo);
+
+        String json = JSON.toJSONString(map);
+        webSocketServer.sendToAllClient(json);
     }
 
     /**
