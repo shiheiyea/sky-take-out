@@ -514,7 +514,7 @@ public class OrderServiceImpl implements OrderService {
 
         Orders orders = Orders.builder()
                 .id(id)
-                .status(Orders.COMPLETED)// 更新订单状态,状态转为派送中
+                .status(Orders.COMPLETED)// 更新订单状态,状态转为完成订单
                 .deliveryTime(LocalDateTime.now())
                 .build();
 
