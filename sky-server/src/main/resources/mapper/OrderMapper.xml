@@ -6,7 +6,8 @@
         insert into orders (number, status, user_id, address_book_id, order_time, checkout_time, pay_method, pay_status,
                             amount, remark, phone, address, user_name, consignee, estimated_delivery_time,
                             delivery_status, pack_amount, tableware_number, tableware_status)
-        values (#{number}, #{status}, #{userId}, #{addressBookId}, #{orderTime}, #{checkoutTime}, #{payMethod}, #{payStatus},
+        values (#{number}, #{status}, #{userId}, #{addressBookId}, #{orderTime}, #{checkoutTime}, #{payMethod},
+                #{payStatus},
                 #{amount}, #{remark}, #{phone}, #{address}, #{userName}, #{consignee}, #{estimatedDeliveryTime},
                 #{deliveryStatus}, #{packAmount}, #{tablewareNumber}, #{tablewareStatus})
     </insert>
@@ -95,5 +96,21 @@
                 and status = #{status}
             </if>
         </where>
+    </select>
+
+    <select id="getSalesTop10" resultType="com.sky.dto.GoodsSalesDTO">
+        select od.name, count(od.number) number
+        from order_detail od, orders o
+        where od.order_id = o.id
+        and o.status = 5
+        <if test="begin != null">
+            and o.order_time &gt; #{begin}
+        </if>
+        <if test="end != null">
+            and order_time &lt; #{end}
+        </if>
+        group by od.name
+        order by number desc
+        limit 0,10
     </select>
 </mapper>
